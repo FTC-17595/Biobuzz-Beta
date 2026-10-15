@@ -9,7 +9,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
-public class field_centric_mecanum_dt extends LinearOpMode {
+public class FieldCentricMecamumDT extends LinearOpMode {
 
 
     @Override
