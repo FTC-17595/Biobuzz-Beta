@@ -17,7 +17,6 @@ public class OutTakeTest extends LinearOpMode {
 
         waitForStart();
         if(isStopRequested()) return;
-
         while (opModeIsActive()) {
             if (gamepad1.a || gamepad2.a) {
                 outTakeMotor.setPower(-1);
