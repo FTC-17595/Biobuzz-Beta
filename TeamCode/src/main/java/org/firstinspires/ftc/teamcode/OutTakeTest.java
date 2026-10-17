@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "WTeleOp")
-public class outaketest extends LinearOpMode {
+@TeleOp(name = "OutTakeTest")
+public class OutTakeTest extends LinearOpMode {
 
     private DcMotor outTakeMotor; // motor define
     private Servo pollenFlicker;
