@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class MecanumFieldReletiveOpMode extends OpMode {
     MecanumDT drive = new MecanumDT();
+
     double forward, strafe, rotate;
 
     public void init(){
