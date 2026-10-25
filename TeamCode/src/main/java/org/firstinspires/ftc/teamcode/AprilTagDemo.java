@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -15,6 +17,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @TeleOp(name = "BioBuzz TeleOp Hive AutoAlign & Shoot", group = "BioBuzz")
 public class AprilTagDemo extends LinearOpMode {
@@ -23,7 +26,7 @@ public class AprilTagDemo extends LinearOpMode {
     private static final String ALLIANCE_COLOR = "RED";
 
     // Target standoff distance (in inches) from camera lens to the Hive Cell opening
-    private static final double DESIRED_DISTANCE = 36.0;
+    private static final double DESIRED_DISTANCE = 50.0; //36.0;
 
     // Launcher RPM tuning constants (tune for your specific flywheel & motor!)
     private static final double TICKS_PER_REV    = 28.0;   // 28.0 for bare REV HD Hex / goBILDA 5202/5203 motor shaft
@@ -31,14 +34,16 @@ public class AprilTagDemo extends LinearOpMode {
     private static final double RPM_PER_INCH     = 35.0;   // Extra RPM added for each inch further than 36 in
 
     // Proportional drivetrain gains (start small and tune on your robot!)
-    private static final double TURN_GAIN   = 0.02;  // Rotates robot so Bearing -> 0
-    private static final double STRAFE_GAIN = 0.015; // Strafes robot so Yaw -> 0
-    private static final double DRIVE_GAIN  = 0.03;  // Drives forward/back so Range -> DESIRED_DISTANCE
+    private static final double TURN_GAIN   = 0.15;  // Rotates robot so Bearing -> 0
+    private static final double STRAFE_GAIN = 0.2; // Strafes robot so Yaw -> 0
+    private static final double DRIVE_GAIN  = 0.1;  // Drives forward/back so Range -> DESIRED_DISTANCE
 
     // Maximum speeds during auto-alignment
     private static final double MAX_AUTO_SPEED  = 0.5;
     private static final double MAX_AUTO_STRAFE = 0.5;
     private static final double MAX_AUTO_TURN   = 0.4;
+
+    public static final double MASTER_DRIVE_MULTIPLIER = 0.3; // reduce max motors speed after normalization
 
     private DcMotor leftFront, rightFront, leftBack, rightBack;
     private DcMotorEx shooterMotor;
@@ -103,7 +108,7 @@ public class AprilTagDemo extends LinearOpMode {
 
                 drive  = Range.clip(rangeError * DRIVE_GAIN, -MAX_AUTO_SPEED, MAX_AUTO_SPEED);
                 turn   = Range.clip(-bearingError * TURN_GAIN, -MAX_AUTO_TURN, MAX_AUTO_TURN);
-                strafe = Range.clip(-yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
+                strafe = Range.clip(yawError * STRAFE_GAIN, -MAX_AUTO_STRAFE, MAX_AUTO_STRAFE);
 
                 targetShooterRpm = BASE_SHOOTER_RPM + ((activeCell.ftcPose.range - DESIRED_DISTANCE) * RPM_PER_INCH);
                 telemetry.addData("Assist Mode", "FULL AUTO-SQUARE + DYNAMIC RPM");
@@ -111,11 +116,14 @@ public class AprilTagDemo extends LinearOpMode {
                 telemetry.addData("Assist Mode", "MANUAL DRIVER CONTROL");
             }
 
+            // Normalization denominator
+            double denominator = Math.max(Math.abs(drive) + Math.abs(strafe) + Math.abs(turn), 1);
+
             // Apply Mecanum drivetrain powers
-            leftFront.setPower(drive + strafe + turn);
-            rightFront.setPower(drive - strafe - turn);
-            leftBack.setPower(drive - strafe + turn);
-            rightBack.setPower(drive + strafe - turn);
+            leftFront.setPower((drive + strafe + turn) / denominator * MASTER_DRIVE_MULTIPLIER);
+            rightFront.setPower((drive - strafe - turn) / denominator * MASTER_DRIVE_MULTIPLIER);
+            leftBack.setPower((drive - strafe + turn) / denominator * MASTER_DRIVE_MULTIPLIER);
+            rightBack.setPower((drive + strafe - turn) / denominator * MASTER_DRIVE_MULTIPLIER);
 
             // Convert Target RPM to Encoder Ticks Per Second and command the launcher motor
             double targetTicksPerSec = (targetShooterRpm / 60.0) * TICKS_PER_REV;
@@ -147,12 +155,43 @@ public class AprilTagDemo extends LinearOpMode {
     private void initAprilTag() {
         aprilTag = new AprilTagProcessor.Builder()
                 .setTagLibrary(AprilTagGameDatabase.getBioBuzzTagLibrary())
+//                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
+//                .setDrawTagID(true)
+//                .setDrawTagOutline(true)
+
                 .build();
+
+          // 2 is standard; use 1 if detecting from far away and robot is stationary
+//        aprilTag.setDecimation(2);
 
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam1"))
+//                .setCameraResolution(new Size(640, 480))
                 .addProcessor(aprilTag)
                 .build();
+
+        // exposure control tweaks to disable motion blur (disconnects tags recognition)
+
+        // 2. Wait for the webcam stream to finish opening
+        while (!isStopRequested() && visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            sleep(20);
+        }
+
+        // 3. Now configure exposure and gain safely
+        if (!isStopRequested()) {
+            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+
+            // Switch to manual mode and set exposure
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+
+            // 8 to 15 milliseconds prevents motion blur on standard webcams
+            exposureControl.setExposure(10, TimeUnit.MILLISECONDS);
+            gainControl.setGain(200); // Boost gain to compensate for darker frames
+        }
     }
 
     /**
