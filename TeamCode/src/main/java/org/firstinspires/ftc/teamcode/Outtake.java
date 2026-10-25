@@ -22,5 +22,6 @@ public class Outtake {
         Thread.sleep(waitTime);
         pollenFlicker.setPosition(0);
         nectarFlicker.setPosition(0);
+
     }
 }

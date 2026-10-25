@@ -29,6 +29,7 @@ public class MainOpMode extends OpMode {
         }
         else {
             inAndMid.runIntakeMidtake(0,0);
+
         }
     }
 }

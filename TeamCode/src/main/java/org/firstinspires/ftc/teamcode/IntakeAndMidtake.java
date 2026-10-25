@@ -13,6 +13,7 @@ public class IntakeAndMidtake {
     public void runIntakeMidtake(double intakePower, double midtakePower){
         intakeMotor.setPower(intakePower);
         midtakeMotor.setPower(midtakePower);
+
     }
 
 }
