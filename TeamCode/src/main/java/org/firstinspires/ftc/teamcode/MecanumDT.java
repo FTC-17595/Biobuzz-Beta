@@ -13,7 +13,7 @@ public class MecanumDT {
     private DcMotor frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor;
 
     private IMU imu;
-    public void init(HardwareMap HwMap){
+    public void initMoveMotor(HardwareMap HwMap){
         frontLeftMotor = HwMap.get(DcMotor.class, "frontLeftMotor");
         backLeftMotor = HwMap.get(DcMotor.class, "backLeftMotor");
         frontRightMotor = HwMap.get(DcMotor.class, "frontRightMotor");
