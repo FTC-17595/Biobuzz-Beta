@@ -7,20 +7,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class MainOpMode extends OpMode {
     MecanumDT drive = new MecanumDT();
     IntakeAndMidtake inAndMid = new IntakeAndMidtake();
+    Outtake outtake = new Outtake();
 
     double forward, strafe, rotate;
 
-    public void init(){
-        drive.initMoveMotor(hardwareMap);
-        inAndMid.initIntakeMidtakeMotor(hardwareMap);
-    }
-
-    public void loop(){
-        forward = gamepad1.left_stick_y;
-        strafe = gamepad1.left_stick_x;
-        rotate = gamepad1.right_stick_x;
-
-        drive.driveFieldRelative(forward, strafe, rotate);
+    private void intakeLoop(){
         if (gamepad2.b){
             inAndMid.runIntakeMidtake(1.0,1.0);
         }
@@ -29,7 +20,34 @@ public class MainOpMode extends OpMode {
         }
         else {
             inAndMid.runIntakeMidtake(0,0);
-
         }
+    }
+
+    private void shootLoop(){
+        if (gamepad2.right_trigger_pressed){
+            outtake.shoot(1.0,1.0);
+        }
+        else {
+            outtake.shoot(0.0,0.0);
+        }
+    }
+
+    public void init(){
+        drive.initMoveMotor(hardwareMap);
+        inAndMid.initIntakeMidtakeMotor(hardwareMap);
+        outtake.initShooterMotorAndFlickerServo(hardwareMap);
+    }
+
+    public void loop(){
+        forward = gamepad1.left_stick_y;
+        strafe = gamepad1.left_stick_x;
+        rotate = gamepad1.right_stick_x;
+
+        drive.driveFieldRelative(forward, strafe, rotate);
+
+        intakeLoop();
+
+        shootLoop();
+
     }
 }

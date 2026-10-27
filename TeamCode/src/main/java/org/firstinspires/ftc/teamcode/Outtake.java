@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Thread.sleep;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -14,14 +15,16 @@ public class Outtake {
         nectarFlicker = HwMap.get(Servo.class,"nectarFlicker");
     }
 
-    public void shoot(double shooterMotorNectarSpeed, double shooterMotorPollenSpeed, double servoPos, int waitTime) throws InterruptedException {
+    public void shoot(double shooterMotorNectarSpeed, double shooterMotorPollenSpeed) {
         shooterMotorNectar.setPower(shooterMotorNectarSpeed);
         shooterMotorPollen.setPower(shooterMotorPollenSpeed);
+    }
+
+    public void flickerLoop(double servoPos, int waitTime) throws InterruptedException{
         pollenFlicker.setPosition(servoPos);
         nectarFlicker.setPosition(servoPos);
-        Thread.sleep(waitTime);
+        sleep(waitTime);
         pollenFlicker.setPosition(0);
         nectarFlicker.setPosition(0);
-
     }
 }
