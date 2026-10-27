@@ -1,0 +1,72 @@
+```java
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@TeleOp(name = "Servo Test", group = "Testing")
+public class ServoTest extends LinearOpMode {
+
+    // Adjust these positions to tune your flap.
+    private static final double DOWN_POSITION = 0.20;
+    private static final double UP_POSITION = 0.46;
+
+    // Time the flap stays raised.
+    private static final long KICK_TIME_MS = 300;
+
+    private Servo flapServo;
+
+    @Override
+    public void runOpMode() {
+
+        // Must match the name in the Robot Configuration.
+        flapServo = hardwareMap.get(Servo.class, "flapServo");
+
+        telemetry.addLine("SERVO TEST");
+        telemetry.addLine("Press A to flick pollen upward.");
+        telemetry.addLine("The flap automatically returns.");
+        telemetry.update();
+
+        // Start with the flap down.
+        flapServo.setPosition(DOWN_POSITION);
+
+        waitForStart();
+
+        if (isStopRequested()) {
+            return;
+        }
+
+        boolean previousA = false;
+
+        while (opModeIsActive()) {
+
+            boolean currentA = gamepad1.a;
+
+            // Trigger once per button press.
+            if (currentA && !previousA) {
+
+                // Flick the flap upward.
+                flapServo.setPosition(UP_POSITION);
+
+                // Allow the flap to stay up briefly.
+                sleep(KICK_TIME_MS);
+
+                // Return to the starting position.
+                if (opModeIsActive()) {
+                    flapServo.setPosition(DOWN_POSITION);
+                }
+            }
+
+            previousA = currentA;
+
+            telemetry.addData("Flap", "Ready");
+            telemetry.addData("Down position", DOWN_POSITION);
+            telemetry.addData("Up position", UP_POSITION);
+            telemetry.addData("Servo command", "%.2f",
+                    flapServo.getPosition());
+            telemetry.update();
+        }
+    }
+}
+```
