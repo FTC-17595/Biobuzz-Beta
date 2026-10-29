@@ -13,22 +13,24 @@ public class MainOpMode extends OpMode {
 
     private void intakeLoop(){
         if (gamepad2.b){
-            inAndMid.runIntakeMidtake(1.0,1.0);
+            inAndMid.runIntakeMidtake(1.0,1.0,0.2);
         }
         else if (gamepad2.a){
-            inAndMid.runIntakeMidtake(-1.0,-1.0);
+            inAndMid.runIntakeMidtake(-1.0,-1.0, -0.2);
         }
         else {
-            inAndMid.runIntakeMidtake(0,0);
+            inAndMid.runIntakeMidtake(0,0,0);
         }
     }
 
     private void shootLoop(){
         if (gamepad2.right_trigger_pressed){
             outtake.shoot(1.0,1.0);
+            outtake.flickerLoop(0.75);
         }
         else {
             outtake.shoot(0.0,0.0);
+            outtake.flickerLoop(0);
         }
     }
 
@@ -48,6 +50,5 @@ public class MainOpMode extends OpMode {
         intakeLoop();
 
         shootLoop();
-
     }
 }

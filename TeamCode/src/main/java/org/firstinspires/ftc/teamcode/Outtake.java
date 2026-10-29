@@ -20,10 +20,9 @@ public class Outtake {
         shooterMotorPollen.setPower(shooterMotorPollenSpeed);
     }
 
-    public void flickerLoop(double servoPos, int waitTime) throws InterruptedException{
+    public void flickerLoop(double servoPos) {
         pollenFlicker.setPosition(servoPos);
         nectarFlicker.setPosition(servoPos);
-        sleep(waitTime);
         pollenFlicker.setPosition(0);
         nectarFlicker.setPosition(0);
     }
