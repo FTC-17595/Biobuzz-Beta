@@ -2,25 +2,15 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "MainTeleOp")
 public class MainTeleOp extends OpMode {
     MecanumDT drive = new MecanumDT();
     IntakeAndMidtake inAndMid = new IntakeAndMidtake();
     Outtake outtake = new Outtake();
-
+    ElapsedTime timer = new ElapsedTime();
     double forward, strafe, rotate;
-
-    //private void shootLoop(){
-        //if (gamepad2.right_trigger_pressed){
-            //outtake.shoot(1.0,1.0);
-            //outtake.flickerLoop(0.75);
-        //}
-        //else {
-            //outtake.shoot(0.0,0.0);
-            //outtake.flickerLoop(0);
-       //}
-    //}
 
     public void init(){
         drive.initMoveMotor(hardwareMap);
@@ -36,20 +26,27 @@ public class MainTeleOp extends OpMode {
         drive.driveFieldRelative(forward, strafe, rotate);
 
         if (gamepad2.b){
-            inAndMid.runIntakeMidtake(1.0,1.0);
+            inAndMid.runIntakeMidtake(1.0,1.0,0.33);
         }
         else if (gamepad2.a){
-            inAndMid.runIntakeMidtake(-1.0,-1.0);
+            inAndMid.runIntakeMidtake(-1.0,-1.0,-0.33);
         }
         else {
-            inAndMid.runIntakeMidtake(0,0);
+            inAndMid.runIntakeMidtake(0,0,0);
         }
         if (gamepad2.right_trigger_pressed){
-            outtake.shoot(1.0);
+            outtake.shoot(1);
             }
         else {
-            outtake.shoot(0.0);
+            outtake.shoot(0);
             }
-    }
+        if (gamepad2.left_trigger_pressed) {
+            outtake.flick(0.75);
 
+        }
+        else {
+            outtake.flick(0.0);
+        }
+
+    }
     }

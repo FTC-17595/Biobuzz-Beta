@@ -8,11 +8,13 @@ public class IntakeAndMidtake {
     public void initIntakeMidtakeMotor(HardwareMap HwMap){
         intakeMotor = HwMap.get(DcMotor.class,"intakeMotor");
         midtakeMotor = HwMap.get(DcMotor.class,"midtakeMotor");
+        midtakeSmallMotor = HwMap.get(DcMotor.class,"midtakeSmallMotor");
     }
 
-    public void runIntakeMidtake(double intakePower, double midtakePower){
+    public void runIntakeMidtake(double intakePower, double midtakePower, double midtakeSmallPower){
         intakeMotor.setPower(intakePower);
         midtakeMotor.setPower(midtakePower);
+        midtakeSmallMotor.setPower(midtakePower);
     }
 
 }
