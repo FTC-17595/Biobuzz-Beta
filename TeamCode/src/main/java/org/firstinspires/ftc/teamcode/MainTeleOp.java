@@ -9,7 +9,8 @@ public class MainTeleOp extends OpMode {
     MecanumDT drive = new MecanumDT();
     IntakeAndMidtake inAndMid = new IntakeAndMidtake();
     Outtake outtake = new Outtake();
-    ElapsedTime timer = new ElapsedTime();
+
+
     double forward, strafe, rotate;
 
     public void init(){
@@ -18,35 +19,39 @@ public class MainTeleOp extends OpMode {
         outtake.initShooterMotorAndFlickerServo(hardwareMap);
     }
 
-    public void loop(){
+    public void loop() {
         forward = -gamepad1.left_stick_y;
         strafe = gamepad1.left_stick_x;
         rotate = gamepad1.right_stick_x;
 
         drive.driveFieldRelative(forward, strafe, rotate);
 
-        if (gamepad2.b){
-            inAndMid.runIntakeMidtake(1.0,1.0,0.33);
+        if (gamepad2.b) {
+            inAndMid.runIntakeMidtake(1.0, 0.33);
+            inAndMid.secondMid(1.0);
+        } else if (gamepad2.a) {
+            inAndMid.runIntakeMidtake(-1.0, -0.33);
+            inAndMid.secondMid(-1);
+        } else {
+            inAndMid.runIntakeMidtake(0, 0);
+            inAndMid.secondMid(0);
         }
-        else if (gamepad2.a){
-            inAndMid.runIntakeMidtake(-1.0,-1.0,-0.33);
-        }
-        else {
-            inAndMid.runIntakeMidtake(0,0,0);
-        }
-        if (gamepad2.right_trigger_pressed){
+        if (gamepad2.right_trigger_pressed) {
             outtake.shoot(1);
-            }
-        else {
+        } else {
             outtake.shoot(0);
-            }
+        }
         if (gamepad2.left_trigger_pressed) {
-            outtake.flick(0.75);
-
+            outtake.flick(0.7);
         }
         else {
-            outtake.flick(0.0);
+            outtake.flick(0);
         }
-
+        if (gamepad2.y){
+            inAndMid.secondMid(1);
+        }
+        if (gamepad2.x){
+            inAndMid.secondMid(-1);
+        }
     }
-    }
+}

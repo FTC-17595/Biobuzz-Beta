@@ -13,7 +13,7 @@ public class MainAuto extends OpMode {
     }
     public void loop(){
         timer.reset();
-        if (timer.seconds() < 2){
+        if (timer.seconds() < 1){
             drive.driveFieldRelative(1,0,0);
         }
         else {

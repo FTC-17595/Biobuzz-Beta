@@ -11,10 +11,12 @@ public class IntakeAndMidtake {
         midtakeSmallMotor = HwMap.get(DcMotor.class,"midtakeSmallMotor");
     }
 
-    public void runIntakeMidtake(double intakePower, double midtakePower, double midtakeSmallPower){
+    public void runIntakeMidtake(double intakePower, double midtakePower){
         intakeMotor.setPower(intakePower);
         midtakeMotor.setPower(midtakePower);
-        midtakeSmallMotor.setPower(midtakePower);
+    }
+    public void secondMid(double secondMidtakePower){
+        midtakeSmallMotor.setPower(secondMidtakePower);
     }
 
 }

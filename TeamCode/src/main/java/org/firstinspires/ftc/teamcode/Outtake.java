@@ -16,6 +16,7 @@ public class Outtake {
 
         shooterMotorPollen.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooterMotorPollen.setDirection(DcMotor.Direction.REVERSE);
+        shooterMotorPollen.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void shoot(double shooterMotorPollenSpeed) {
@@ -24,5 +25,4 @@ public class Outtake {
     public void flick(double flickPos){
         pollenFlicker.setPosition(flickPos);
     }
-
 }
