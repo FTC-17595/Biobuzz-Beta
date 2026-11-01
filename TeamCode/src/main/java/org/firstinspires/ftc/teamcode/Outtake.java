@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Outtake {
-    private DcMotor shooterMotorPollen;
+    public DcMotor shooterMotorPollen;
     private Servo pollenFlicker;
 
     public void initShooterMotorAndFlickerServo(HardwareMap HwMap) {

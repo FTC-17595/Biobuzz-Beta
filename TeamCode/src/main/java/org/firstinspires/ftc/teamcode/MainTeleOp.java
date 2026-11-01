@@ -9,7 +9,7 @@ public class MainTeleOp extends OpMode {
     MecanumDT drive = new MecanumDT();
     IntakeAndMidtake inAndMid = new IntakeAndMidtake();
     Outtake outtake = new Outtake();
-
+    BlockerServo blocker = new BlockerServo();
 
     double forward, strafe, rotate;
 
@@ -17,6 +17,8 @@ public class MainTeleOp extends OpMode {
         drive.initMoveMotor(hardwareMap);
         inAndMid.initIntakeMidtakeMotor(hardwareMap);
         outtake.initShooterMotorAndFlickerServo(hardwareMap);
+        blocker.initBlockerServo(hardwareMap);
+
     }
 
     public void loop() {
@@ -53,5 +55,21 @@ public class MainTeleOp extends OpMode {
         if (gamepad2.x){
             inAndMid.secondMid(-1);
         }
+
+        if (gamepad1.a){
+            blocker.blockedByJames(0.5);
+        }
+        if (gamepad1.b) {
+            blocker.blockedByJames(-0.5);
+        }
+        else {
+            blocker.blockedByJames(0);
+        }
+
+
+        double power = outtake.shooterMotorPollen.getPower();
+        double shooterRPM = (power * 6000);
+        telemetry.addData("Shooter RPM", shooterRPM);
+        telemetry.update();
     }
 }
