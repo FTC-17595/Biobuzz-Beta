@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class MecanumDT {
     private DcMotor frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor;
 
-    private IMU imu;
+    public IMU imu;
     public void initMoveMotor(HardwareMap HwMap){
         frontLeftMotor = HwMap.get(DcMotor.class, "frontLeftMotor");
         backLeftMotor = HwMap.get(DcMotor.class, "backLeftMotor");
@@ -73,4 +73,5 @@ public class MecanumDT {
         this.drive(newForward, newStrafe, rotate);
 
     }
+
 }

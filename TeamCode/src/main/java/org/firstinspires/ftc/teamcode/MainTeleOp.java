@@ -39,7 +39,7 @@ public class MainTeleOp extends OpMode {
             inAndMid.secondMid(0);
         }
         if (gamepad2.right_trigger_pressed) {
-            outtake.shoot(1);
+            outtake.shoot(1200);
         } else {
             outtake.shoot(0);
         }
@@ -56,20 +56,28 @@ public class MainTeleOp extends OpMode {
             inAndMid.secondMid(-1);
         }
 
-        if (gamepad1.a){
-            blocker.blockedByJames(0.5);
-        }
-        if (gamepad1.b) {
-            blocker.blockedByJames(-0.5);
+
+        if (gamepad1.right_trigger_pressed) {
+            blocker.blockedByJames(-0.95);
         }
         else {
             blocker.blockedByJames(0);
         }
 
+        double velocity = outtake.shooterMotorPollen.getVelocity();
 
-        double power = outtake.shooterMotorPollen.getPower();
-        double shooterRPM = (power * 6000);
-        telemetry.addData("Shooter RPM", shooterRPM);
+        telemetry.addData("Shooter Velocity", outtake.shooterMotorPollen.getVelocity());
+        if (velocity <= 1325 || velocity >= 1100){
+            telemetry.addLine("True");
+        }
+        else {
+            telemetry.addLine("False");
+        }
         telemetry.update();
+
+        if(gamepad1.left_bumper){
+            drive.imu.resetYaw();
+        }
+        outtake.motorVelocity();
     }
 }
