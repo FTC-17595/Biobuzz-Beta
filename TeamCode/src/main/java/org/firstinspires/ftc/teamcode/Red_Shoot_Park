@@ -1,0 +1,119 @@
+package org.firstinspires.ftc.teamcode.pedroPathing;
+
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+
+/**
+ * Generated from Red_Shoot_Park.pp.json
+ *
+ * Sequence:
+ *   1. "Shoot Red"  - (56, 8) -> (56, 7.66), heading 90 deg, then shoot()
+ *   2. "Park Red"   - (56, 7.66) -> (10.82, 94.72), heading 180 deg
+ */
+@Autonomous(name = "Red Shoot Park", group = "Red")
+public class RedShootPark extends OpMode {
+
+    private Follower follower;
+    private int pathState;
+
+    // Poses (Pedro coordinates, inches / radians)
+    private final Pose startPose = new Pose(56, 8, Math.toRadians(90));
+    private final Pose shootPose = new Pose(56, 7.664357682619638, Math.toRadians(90));
+    private final Pose parkPose  = new Pose(10.82396215233007, 94.72456695891606, Math.toRadians(180));
+
+    private PathChain shootRed;
+    private PathChain parkRed;
+
+    public void buildPaths() {
+        // Line 1: "Shoot Red" (constant heading 90 deg)
+        shootRed = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, shootPose))
+                .setConstantHeadingInterpolation(Math.toRadians(90))
+                .build();
+
+        // Line 2: "Park Red" (constant heading 180 deg)
+        parkRed = follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, parkPose))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
+    }
+
+    /**
+     * TODO (team): put the shooting code here.
+     * Replaces the old 1600 ms wait. Called once when the robot reaches the shoot spot.
+     */
+    private void shoot() {
+    }
+
+    /**
+     * TODO (team): return true once the shooter is finished.
+     * Returns true for now so the auto never gets stuck waiting.
+     */
+    private boolean isShootFinished() {
+        return true;
+    }
+
+    public void autonomousPathUpdate() {
+        switch (pathState) {
+            case 0:
+                follower.followPath(shootRed);
+                setPathState(1);
+                break;
+
+            case 1:
+                // Wait until the robot reaches the shoot spot, then shoot once
+                if (!follower.isBusy()) {
+                    shoot();
+                    setPathState(2);
+                }
+                break;
+
+            case 2:
+                // Wait for shooting to finish, then go park
+                if (isShootFinished()) {
+                    follower.followPath(parkRed);
+                    setPathState(3);
+                }
+                break;
+
+            case 3:
+                if (!follower.isBusy()) {
+                    setPathState(-1); // done
+                }
+                break;
+        }
+    }
+
+    public void setPathState(int state) {
+        pathState = state;
+    }
+
+    @Override
+    public void init() {
+        follower = Constants.createFollower(hardwareMap);
+        buildPaths();
+        follower.setStartingPose(startPose);
+        pathState = 0;
+    }
+
+    @Override
+    public void start() {
+        setPathState(0);
+    }
+
+    @Override
+    public void loop() {
+        follower.update();
+        autonomousPathUpdate();
+
+        telemetry.addData("path state", pathState);
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading (deg)", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.update();
+    }
+}
